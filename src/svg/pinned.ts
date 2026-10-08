@@ -35,7 +35,7 @@ export function renderPinned(repos: RepoInfo[], icons: Record<string, string>): 
     body += text({ x: PAD, y: 56, text: "no repositories to pin yet", size: 12, fill: COLORS.muted }, FONT, FONT);
   }
 
-  const { chrome } = terminalCard("pinned.sh", WIDTH, H, MONO);
+  const { chrome } = terminalCard("pinned", WIDTH, H, MONO);
   return svgOpen(WIDTH, H) + chrome + body + svgClose();
 }
 

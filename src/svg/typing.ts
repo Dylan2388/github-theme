@@ -24,7 +24,7 @@ interface Point {
  * but is 0 outside the word's slot, so only the active word is revealed as it
  * types. keyTimes are normalized to [0,1] to match dur=total.
  */
-export function renderTyping(words: string[], title = "now.sh"): string {
+export function renderTyping(words: string[], title = "now"): string {
   const list = words.length ? words : ["hello"];
   const longest = list.reduce((m, w) => Math.max(m, w.length), 0);
   const W = Math.max(WIDTH, PREFIX.length * CHAR_W + longest * CHAR_W + 96);

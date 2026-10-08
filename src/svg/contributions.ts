@@ -72,8 +72,71 @@ export function renderContributions(cal: Calendar): string {
     body += cell;
   }
 
-  const { chrome } = terminalCard("contributions.sh", WIDTH, H, MONO);
+  body += renderSnake(cal.days, weeks);
+
+  const { chrome } = terminalCard("activity", WIDTH, H, MONO);
   return svgOpen(WIDTH, H) + chrome + body + svgClose();
+}
+
+/**
+ * A snake crawling the grid: a chain of circles following a boustrophedon path
+ * (down column 0, up column 1, ...) via SMIL animateMotion. The negative begin
+ * offsets phase-shift the segments so they trail the head on one loop.
+ */
+function renderSnake(days: Calendar["days"], weeks: number): string {
+  const R = 4.2;
+  const cellPos = new Map<string, { x: number; y: number }>();
+  for (const d of days) {
+    if (!d.date) continue;
+    cellPos.set(`${d.week}-${d.dow}`, {
+      x: PAD_L + d.week * STEP + CELL / 2,
+      y: GRID_Y + d.dow * STEP + CELL / 2,
+    });
+  }
+
+  // boustrophedon ordering
+  const pts: { x: number; y: number }[] = [];
+  let down = true;
+  for (let w = 0; w < weeks; w++) {
+    const dows = down ? [0, 1, 2, 3, 4, 5, 6] : [6, 5, 4, 3, 2, 1, 0];
+    for (const dow of dows) {
+      const p = cellPos.get(`${w}-${dow}`);
+      if (p) pts.push(p);
+    }
+    down = !down;
+  }
+  if (pts.length < 2) return "";
+
+  const path =
+    "M " + pts.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" L ");
+  const pathLen = (pts.length - 1) * STEP; // each hop is one cell
+  const head = pts[0];
+
+  const N = 64; // visible body segments
+  const spacing = R * 2; // contiguous circles
+  const total = 46; // seconds per full crawl
+  const delta = (total * spacing) / pathLen;
+
+  let segs = `<path id="snakePath" d="${path}" fill="none" stroke="none"></path>`;
+  for (let i = N - 1; i >= 0; i--) {
+    // i=0 is the head (drawn last, on top). Tail first so the head overlaps it.
+    const isHead = i === 0;
+    const r = isHead ? R * 1.25 : R;
+    const fill = isHead ? COLORS.accent2 : COLORS.accent;
+    const begin = (i * delta - total).toFixed(3); // negative => already mid-loop
+    segs +=
+      `<circle cx="${head.x.toFixed(1)}" cy="${head.y.toFixed(1)}" r="${r.toFixed(2)}" fill="${fill}">` +
+      `<animateMotion dur="${total}s" begin="${begin}s" repeatCount="indefinite" rotate="0">` +
+      `<mpath xlink:href="#snakePath" href="#snakePath"></mpath></animateMotion>` +
+      `</circle>`;
+  }
+  // head eye
+  segs +=
+    `<circle cx="${head.x.toFixed(1)}" cy="${head.y.toFixed(1)}" r="1.4" fill="${COLORS.bg}">` +
+    `<animateMotion dur="${total}s" begin="${(-total).toFixed(3)}s" repeatCount="indefinite" rotate="0">` +
+    `<mpath xlink:href="#snakePath" href="#snakePath"></mpath></animateMotion></circle>`;
+
+  return `<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="0.9s" dur="0.8s" fill="freeze"></animate>${segs}</g>`;
 }
 
 function monthName(iso: string): string {

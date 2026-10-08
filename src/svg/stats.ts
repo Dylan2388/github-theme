@@ -37,7 +37,7 @@ export function renderStats(d: ProfileData, icons: Record<string, string>): stri
     body += `<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${delay}s" dur="0.5s" fill="freeze"></animate>${inner}</g>`;
   });
 
-  const { chrome } = terminalCard("stats.sh", WIDTH, H, MONO);
+  const { chrome } = terminalCard("numbers", WIDTH, H, MONO);
   return svgOpen(WIDTH, H) + chrome + body + svgClose();
 }
 

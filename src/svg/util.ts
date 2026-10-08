@@ -85,7 +85,7 @@ export function fadeIn(delay: number, dur = 0.45): string {
 }
 
 export function svgOpen(w: number, h: number): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
 }
 
 export function svgClose(): string {

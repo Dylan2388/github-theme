@@ -14,6 +14,13 @@ permissions:
 jobs:
   build-profile:
     runs-on: ubuntu-latest
+    # PROFILE_TOKEN (fine-grained PAT) is preferred so publish can create the
+    # <user>/<user> repo on first run. Falls back to the default GITHUB_TOKEN
+    # (which is enough to read + push once the repo exists). GH_TOKEN lets the
+    # `gh` CLI fallback in build.ts work too.
+    env:
+      GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN || github.token }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,16 +34,8 @@ jobs:
       - name: Install
         run: npm ci
 
-      # PROFILE_TOKEN must be a classic PAT with `repo` scope so publish can
-      # create/push to the <username>/<username> profile repo.
       - name: Build
         run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}
 
-      # PROFILE_TOKEN must be a classic PAT with `repo` scope so publish can
-      # create/push to the <username>/<username> profile repo.
       - name: Publish
         run: npm run publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}

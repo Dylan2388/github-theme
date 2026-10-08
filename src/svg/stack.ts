@@ -38,6 +38,6 @@ export function renderStack(skills: Skill[]): string {
     `<stop offset="100%" stop-color="${COLORS.accent2}"></stop>` +
     `</linearGradient></defs>`;
 
-  const { chrome } = terminalCard("stack.sh", WIDTH, H, MONO);
+  const { chrome } = terminalCard("stack", WIDTH, H, MONO);
   return svgOpen(WIDTH, H) + defs + chrome + body + svgClose();
 }

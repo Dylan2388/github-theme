@@ -1,53 +1,56 @@
+// Rose Pine palette - kept in sync with ~/.config ghostty themes/rosepine
+// (wezterm color_scheme, ghostty config-file, alacritty repothemes/rose-pine).
 export const COLORS = {
-  bg: "#0d1117",
-  panel: "#161b22",
-  panel2: "#1c2129",
-  border: "#30363d",
-  text: "#e6edf3",
-  muted: "#8b949e",
-  faint: "#6e7681",
-  accent: "#58a6ff",
-  accent2: "#bc8cff",
-  green: "#3fb950",
-  red: "#ff5f56",
-  yellow: "#ffbd2e",
-  greenDot: "#27c93f",
+  bg: "#191724", // rose-pine base
+  panel: "#141220",
+  panel2: "#1f1d2d",
+  border: "#2a2837", // rose-pine surface0
+  text: "#e0def4", // rose-pine text
+  muted: "#908caa", // between overlay1/subtext0
+  faint: "#6e6a86", // rose-pine overlay1
+  accent: "#c4a7e7", // mauve
+  accent2: "#9ccfd8", // iridescent
+  green: "#3e8fb0", // goldish-blue (positive)
+  red: "#eb6f92", // pine rose
+  yellow: "#f6c177", // pine gold
+  greenDot: "#31748f", // pine green-blue
 } as const;
 
-export const CONTRIB = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"] as const;
+// GitHub's contribution green scale, remapped to rose-pine blues/iridescent.
+export const CONTRIB = ["#1f1d2d", "#223047", "#2e4a6b", "#4a719c", "#89dceb"] as const;
 
 export const FONT = "-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans, Helvetica, Arial, sans-serif";
-export const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+export const MONO = "JetBrainsMono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
+// GitHub language colors, tinted into the rose-pine family.
 export const LANG_COLORS: Record<string, string> = {
-  Python: "#3572A5",
-  "Jupyter Notebook": "#DA5B0B",
-  TypeScript: "#3178c6",
-  JavaScript: "#f1e05a",
-  "C++": "#f34b7d",
-  C: "#555555",
-  Rust: "#dea584",
-  Go: "#00ADD8",
-  Shell: "#89e051",
-  TeX: "#3C8C4E",
-  HTML: "#e34c26",
-  CSS: "#563d7c",
-  Java: "#b07219",
-  Kotlin: "#A97BFF",
-  Swift: "#F05138",
-  Ruby: "#701516",
-  PHP: "#4F5D95",
-  Dart: "#00B4AB",
-  Lua: "#000080",
-  Vue: "#41B883",
-  Dockerfile: "#384d54",
-  Makefile: "#427819",
-  "Visual Basic .NET": "#945db7",
-  CMake: "#6f4e37",
-  SCSS: "#c6538c",
-  PowerShell: "#012456",
-  R: "#198CE7",
-  Julia: "#a270ba",
+  Python: "#9ccfd8",
+  TypeScript: "#c4a7e7",
+  JavaScript: "#f6c177",
+  "Jupyter Notebook": "#ebbcba",
+  "C++": "#eb6f92",
+  C: "#908caa",
+  Rust: "#f5e0dc",
+  Go: "#89dceb",
+  Shell: "#3e8fb0",
+  TeX: "#7aa2f0",
+  HTML: "#ebbcba",
+  CSS: "#c4a7e7",
+  Java: "#f6c177",
+  Kotlin: "#c4a7e7",
+  Swift: "#eb6f92",
+  Ruby: "#f2cdcd",
+  PHP: "#908caa",
+  Dart: "#31748f",
+  Lua: "#7aa2f0",
+  Vue: "#3e8fb0",
+  Dockerfile: "#6e6a86",
+  Makefile: "#31748f",
+  CMake: "#f6c177",
+  SCSS: "#c4a7e7",
+  PowerShell: "#6e6a86",
+  R: "#7aa2f0",
+  Julia: "#c4a7e7",
 };
 
 export function langColor(lang?: string | null): string {
