@@ -74,3 +74,7 @@ Because those URLs point at the profile repo's `main` branch, the cards update f
 ## Automation
 
 `.github/workflows/build-profile.yml` regenerates and publishes the profile on a schedule (daily), on manual dispatch, and on every push to `main`. The workflow uses a `PROFILE_TOKEN` secret, which must be a classic personal access token with `repo` scope so it can create and push to the profile repo.
+
+## CI
+
+`build-profile.yml` regenerates + publishes the profile on push to main and daily at 05:17 UTC.
