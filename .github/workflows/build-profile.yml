@@ -1,0 +1,42 @@
+name: build-profile
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-profile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # PROFILE_TOKEN must be a classic PAT with `repo` scope so publish can
+      # create/push to the <username>/<username> profile repo.
+      - name: Build
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}
+
+      # PROFILE_TOKEN must be a classic PAT with `repo` scope so publish can
+      # create/push to the <username>/<username> profile repo.
+      - name: Publish
+        run: npm run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}

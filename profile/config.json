@@ -1,0 +1,28 @@
+{
+  "user": "Dylan2388",
+  "name": "Dylan",
+  "status": "open to interesting problems",
+  "bio": "Software engineer working across systems, data and ML tooling. I like clean abstractions, fast feedback loops, and automation that quietly gets out of the way.",
+  "location": "Stockholm, SE",
+  "org": "Ericsson",
+  "email": "hoangdungpham0703@gmail.com",
+  "footer": "built with a little bit of github api + one opinionated build script",
+  "typing": [
+    "designing distributed systems",
+    "wrangling data pipelines",
+    "profiling python & rust",
+    "automating the boring parts",
+    "reading papers at 2x speed"
+  ],
+  "skills": [
+    { "name": "Python", "level": 92 },
+    { "name": "C / C++", "level": 78 },
+    { "name": "Rust", "level": 64 },
+    { "name": "TypeScript", "level": 55 },
+    { "name": "Go", "level": 48 },
+    { "name": "Kubernetes / Containers", "level": 70 },
+    { "name": "ML infra (GPU clusters)", "level": 82 }
+  ],
+  "pinned": "auto",
+  "pinnedCount": 4
+}

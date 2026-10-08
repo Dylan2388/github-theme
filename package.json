@@ -1,0 +1,18 @@
+{
+  "name": "github-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generate a dynamic, self-updating GitHub profile README (SVG cards + markdown)",
+  "scripts": {
+    "build": "tsx src/build.ts",
+    "build:demo": "tsx src/build.ts --demo",
+    "preview": "tsx src/build.ts --demo --preview",
+    "typecheck": "tsc --noEmit",
+    "publish": "tsx src/publish.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
