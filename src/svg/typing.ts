@@ -107,8 +107,11 @@ export function renderTyping(words: string[], title = "now"): string {
       const fc = fullCycle(pts);
       const kt = norm(fc.map((p) => p.t));
       const vals = fc.map((p) => p.w.toFixed(1)).join(";");
+      // Discrete steps: each glyph appears whole at its tick, identical for the
+      // first char and the rest (a linear sweep fades the first glyph in
+      // gradually because the reveal edge crosses its ink immediately).
       return `<clipPath id="typing-clip-${i}"><rect x="${clipX}" y="${LINE_Y - FONT_SIZE}" width="0" height="${FONT_SIZE + 8}">` +
-        `<animate attributeName="width" calcMode="linear" dur="${total.toFixed(3)}s" repeatCount="indefinite" ` +
+        `<animate attributeName="width" calcMode="discrete" dur="${total.toFixed(3)}s" repeatCount="indefinite" ` +
         `keyTimes="${kt}" values="${vals}"></animate></rect></clipPath>`;
     })
     .join("");
@@ -124,7 +127,7 @@ export function renderTyping(words: string[], title = "now"): string {
   const caretSvg =
     `<rect x="${textX}" y="${LINE_Y - FONT_SIZE + 2}" width="${caretW}" height="${caretH}" fill="${COLORS.accent}">` +
     `<animate attributeName="opacity" calcMode="discrete" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1.05s" repeatCount="indefinite"></animate>` +
-    `<animate attributeName="x" calcMode="linear" dur="${total.toFixed(3)}s" repeatCount="indefinite" ` +
+      `<animate attributeName="x" calcMode="discrete" dur="${total.toFixed(3)}s" repeatCount="indefinite" ` +
     `keyTimes="${norm(caretPts.map((p) => p.t))}" values="${caretPts.map((p) => p.w.toFixed(1)).join(";")}"></animate>` +
     `</rect>`;
 
