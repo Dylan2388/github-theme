@@ -10,6 +10,9 @@ const DELETE_STEP = 0.03;
 const HOLD = 1.6;
 const PAUSE = 0.35;
 const H = 118;
+// Extend the clip a few px to the LEFT of the text so the first glyph's left
+// edge (its anti-aliased overhang) is never cut off as the clip opens.
+const CLIP_PAD = 4;
 
 interface Point {
   t: number;
@@ -31,8 +34,13 @@ export function renderTyping(words: string[], title = "now"): string {
 
   const prefixX = 24;
   const textX = prefixX + PREFIX.length * CHAR_W;
+  const clipX = textX - CLIP_PAD; // start left of the first glyph's left bearing
   const caretW = 10;
   const caretH = FONT_SIZE + 4;
+
+  // Clip width for "i chars visible" includes the left pad so glyph side
+  // bearings are never sliced.
+  const wAt = (i: number) => (i <= 0 ? 0 : CLIP_PAD + i * CHAR_W);
 
   // Build per-word in-slot (t, width) points plus the global caret timeline.
   const slotPoints: Point[][] = [];
@@ -46,17 +54,17 @@ export function renderTyping(words: string[], title = "now"): string {
     // typing
     for (let i = 1; i <= word.length; i++) {
       t += TYPE_STEP;
-      pts.push({ t, w: i * CHAR_W });
+      pts.push({ t, w: wAt(i) });
       caretPts.push({ t, w: textX + i * CHAR_W });
     }
-    // hold
+    // hold (full word + right pad so the last glyph's right bearing shows)
     t += HOLD;
-    pts.push({ t, w: full });
+    pts.push({ t, w: full + 2 * CLIP_PAD });
     caretPts.push({ t, w: textX + full });
     // deleting
     for (let i = word.length - 1; i >= 0; i--) {
       t += DELETE_STEP;
-      pts.push({ t, w: i * CHAR_W });
+      pts.push({ t, w: wAt(i) });
       caretPts.push({ t, w: textX + i * CHAR_W });
     }
     // pause
@@ -99,7 +107,7 @@ export function renderTyping(words: string[], title = "now"): string {
       const fc = fullCycle(pts);
       const kt = norm(fc.map((p) => p.t));
       const vals = fc.map((p) => p.w.toFixed(1)).join(";");
-      return `<clipPath id="typing-clip-${i}"><rect x="${textX}" y="${LINE_Y - FONT_SIZE}" width="0" height="${FONT_SIZE + 8}">` +
+      return `<clipPath id="typing-clip-${i}"><rect x="${clipX}" y="${LINE_Y - FONT_SIZE}" width="0" height="${FONT_SIZE + 8}">` +
         `<animate attributeName="width" calcMode="linear" dur="${total.toFixed(3)}s" repeatCount="indefinite" ` +
         `keyTimes="${kt}" values="${vals}"></animate></rect></clipPath>`;
     })

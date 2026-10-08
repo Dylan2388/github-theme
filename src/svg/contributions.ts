@@ -72,45 +72,31 @@ export function renderContributions(cal: Calendar): string {
     body += cell;
   }
 
-  body += renderSnake(cal.days, weeks);
+  body += renderSnake(weeks);
 
   const { chrome } = terminalCard("activity", WIDTH, H, MONO);
   return svgOpen(WIDTH, H) + chrome + body + svgClose();
 }
 
 /**
- * A snake crawling the grid: a chain of circles following a boustrophedon path
- * (down column 0, up column 1, ...) via SMIL animateMotion. The negative begin
- * offsets phase-shift the segments so they trail the head on one loop.
+ * A snake crawling the grid on a random walk: a chain of circles following a
+ * seeded random-wander path via SMIL animateMotion. The walk is deterministic
+ * (fixed seed) so every build is reproducible, but the path looks random.
+ * Negative begin offsets phase-shift the segments so they trail the head.
  */
-function renderSnake(days: Calendar["days"], weeks: number): string {
+function renderSnake(weeks: number): string {
   const R = 4.2;
-  const cellPos = new Map<string, { x: number; y: number }>();
-  for (const d of days) {
-    if (!d.date) continue;
-    cellPos.set(`${d.week}-${d.dow}`, {
-      x: PAD_L + d.week * STEP + CELL / 2,
-      y: GRID_Y + d.dow * STEP + CELL / 2,
-    });
-  }
 
-  // boustrophedon ordering
-  const pts: { x: number; y: number }[] = [];
-  let down = true;
-  for (let w = 0; w < weeks; w++) {
-    const dows = down ? [0, 1, 2, 3, 4, 5, 6] : [6, 5, 4, 3, 2, 1, 0];
-    for (const dow of dows) {
-      const p = cellPos.get(`${w}-${dow}`);
-      if (p) pts.push(p);
-    }
-    down = !down;
-  }
+  const pts = randomWalk(weeks);
   if (pts.length < 2) return "";
+  const head = pts[0];
 
   const path =
     "M " + pts.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" L ");
-  const pathLen = (pts.length - 1) * STEP; // each hop is one cell
-  const head = pts[0];
+  let pathLen = 0;
+  for (let i = 1; i < pts.length; i++) {
+    pathLen += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+  }
 
   const N = 64; // visible body segments
   const spacing = R * 2; // contiguous circles
@@ -137,6 +123,58 @@ function renderSnake(days: Calendar["days"], weeks: number): string {
     `<mpath xlink:href="#snakePath" href="#snakePath"></mpath></animateMotion></circle>`;
 
   return `<g opacity="0"><animate attributeName="opacity" from="0" to="1" begin="0.9s" dur="0.8s" fill="freeze"></animate>${segs}</g>`;
+}
+
+// Deterministic PRNG (mulberry32) so the random walk is reproducible per build.
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// A random-wander across the grid: step to a random 8-neighbour (clamped to
+// bounds), preferring unvisited cells so it wanders instead of bouncing.
+// Returns pixel-centre points in crawl order (head first).
+function randomWalk(weeks: number): { x: number; y: number }[] {
+  const rand = mulberry32(0x5eed);
+  const DIRS = [
+    [1, 0], [1, 1], [0, 1], [-1, 1],
+    [-1, 0], [-1, -1], [0, -1], [1, -1],
+  ];
+  const maxW = weeks - 1;
+  const maxD = 6;
+
+  let w = Math.floor(rand() * (maxW + 1));
+  let d = Math.floor(rand() * (maxD + 1));
+  const seen = new Set<string>([`${w}-${d}`]);
+  const pts: { x: number; y: number }[] = [];
+  const HOPS = 300;
+
+  for (let i = 0; i < HOPS; i++) {
+    pts.push({ x: PAD_L + w * STEP + CELL / 2, y: GRID_Y + d * STEP + CELL / 2 });
+    let next: [number, number] | null = null;
+    for (let attempt = 0; attempt < 6 && !next; attempt++) {
+      const dir = DIRS[Math.floor(rand() * DIRS.length)];
+      const nw = w + dir[0];
+      const nd = d + dir[1];
+      if (nw < 0 || nw > maxW || nd < 0 || nd > maxD) continue;
+      if (!seen.has(`${nw}-${nd}`)) next = [nw, nd];
+    }
+    if (next) {
+      w = next[0];
+      d = next[1];
+      seen.add(`${w}-${d}`);
+    } else {
+      // local area exhausted: jump to a new spot to keep wandering
+      w = Math.floor(rand() * (maxW + 1));
+      d = Math.floor(rand() * (maxD + 1));
+    }
+  }
+  return pts;
 }
 
 function monthName(iso: string): string {
